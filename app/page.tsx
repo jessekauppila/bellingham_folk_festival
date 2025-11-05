@@ -2,9 +2,12 @@
 
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
+import debug from '../lib/debug';
 import EventsFetcher, {
   type EventData,
 } from '../components/EventsFetcher';
+
+const log = debug('app:home');
 
 export default function Home() {
   // Google Sheet ID and GID
@@ -17,10 +20,10 @@ export default function Home() {
 
   const handleDataFetched = useCallback((data: EventData[]) => {
     setEvents(data);
-    console.log('[Home] REAL sheet events data received:', data);
+    log('Events data received:', data);
   }, []);
 
-  console.log('[Home] REAL sheet events data received:', events);
+  log('Current events state:', events);
 
   return (
     <>

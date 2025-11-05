@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import debug from '../../lib/debug';
+
+const log = debug('app:events');
+const logError = debug('app:events:error');
 
 export type EventData = Record<string, string>;
 
@@ -23,26 +27,26 @@ export default function EventsFetcher({
 
   // Log state changes
   useEffect(() => {
-    console.log('[EventsFetcher] Loading state:', loading);
+    log('Loading state:', loading);
   }, [loading]);
 
   useEffect(() => {
     if (data) {
-      console.log('[EventsFetcher] Data fetched:', data);
+      log('Data fetched:', data);
     }
   }, [data]);
 
   useEffect(() => {
     if (error) {
-      console.error('[EventsFetcher] Error state:', error);
+      logError('Error state:', error);
     }
   }, [error]);
 
   useEffect(() => {
     // Fetch events data when component mounts or props change
     const fetchEvents = async () => {
-      console.log(
-        '[EventsFetcher] Starting fetch for sheetId:',
+      log(
+        'Starting fetch for sheetId:',
         sheetId,
         'gid:',
         gid,
@@ -56,7 +60,7 @@ export default function EventsFetcher({
         const url = `/api/events?sheetId=${encodeURIComponent(
           sheetId
         )}&gid=${encodeURIComponent(gid)}&headerRow=${headerRow}`;
-        console.log('[EventsFetcher] Fetching from URL:', url);
+        log('Fetching from URL:', url);
         const res = await fetch(url);
 
         if (!res.ok) {
@@ -64,15 +68,15 @@ export default function EventsFetcher({
         }
 
         const result = await res.json();
-        console.log('[EventsFetcher] API response:', result);
+        log('API response:', result);
 
         if (result.error) {
           throw new Error(result.error);
         }
 
         setData(result.data);
-        console.log(
-          '[EventsFetcher] Data set successfully, count:',
+        log(
+          'Data set successfully, count:',
           result.data?.length || 0
         );
 
@@ -84,12 +88,10 @@ export default function EventsFetcher({
         const error =
           err instanceof Error ? err : new Error('Unknown error');
         setError(error);
-        console.error('[EventsFetcher] Error caught:', error);
+        logError('Error caught:', error);
       } finally {
         setLoading(false);
-        console.log(
-          '[EventsFetcher] Fetch completed, loading set to false'
-        );
+        log('Fetch completed, loading set to false');
       }
     };
 
