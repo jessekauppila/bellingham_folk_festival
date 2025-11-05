@@ -8,39 +8,22 @@ import EventsFetcher, {
 
 export default function Home() {
   // Google Sheet ID and GID
-  const SHEET_ID = '19AjfMkHUofRTnCry6NQXE96U-nYW45LvrrQsAPw8aSc';
-  const GID = '0';
 
   const REAL_SHEET_ID =
     '1ELrjMXnCNGgzCFMhRU6IeGp6hkaua_WECATAvRdBubM';
   const REAL_GID = '0';
 
-  const [testEvents, setTestEvents] = useState<EventData[] | null>(
-    null
-  );
   const [events, setEvents] = useState<EventData[] | null>(null);
-
-  const handleTestDataFetched = useCallback((data: EventData[]) => {
-    setTestEvents(data);
-    console.log('[Home] Test sheet events data received:', data);
-  }, []);
 
   const handleDataFetched = useCallback((data: EventData[]) => {
     setEvents(data);
     console.log('[Home] REAL sheet events data received:', data);
   }, []);
 
-  console.log('[Home] Test sheet events data received:', testEvents);
   console.log('[Home] REAL sheet events data received:', events);
 
   return (
     <>
-      <EventsFetcher
-        sheetId={SHEET_ID}
-        gid={GID}
-        headerRow={1}
-        onDataFetched={handleTestDataFetched}
-      />
       <EventsFetcher
         sheetId={REAL_SHEET_ID}
         gid={REAL_GID}
