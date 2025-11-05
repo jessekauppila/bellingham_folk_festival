@@ -7,12 +7,14 @@ export type EventData = Record<string, string>;
 interface EventsFetcherProps {
   sheetId: string;
   gid?: string; // defaults to '0'
+  headerRow?: number; // defaults to 1 (1-indexed row number)
   onDataFetched?: (data: EventData[]) => void; // optional callback
 }
 
 export default function EventsFetcher({
   sheetId,
   gid = '0',
+  headerRow = 1,
   onDataFetched,
 }: EventsFetcherProps) {
   const [data, setData] = useState<EventData[] | null>(null);
@@ -43,7 +45,9 @@ export default function EventsFetcher({
         '[EventsFetcher] Starting fetch for sheetId:',
         sheetId,
         'gid:',
-        gid
+        gid,
+        'headerRow:',
+        headerRow
       );
       setLoading(true);
       setError(null);
@@ -51,7 +55,7 @@ export default function EventsFetcher({
       try {
         const url = `/api/events?sheetId=${encodeURIComponent(
           sheetId
-        )}&gid=${encodeURIComponent(gid)}`;
+        )}&gid=${encodeURIComponent(gid)}&headerRow=${headerRow}`;
         console.log('[EventsFetcher] Fetching from URL:', url);
         const res = await fetch(url);
 
@@ -91,7 +95,7 @@ export default function EventsFetcher({
 
     fetchEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sheetId, gid]); // onDataFetched intentionally excluded to prevent infinite loops
+  }, [sheetId, gid, headerRow]); // Add headerRow to dependencies
 
   // Component doesn't render anything, just handles data fetching
   return null;

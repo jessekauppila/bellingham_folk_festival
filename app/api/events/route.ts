@@ -4,11 +4,23 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const sheetId = searchParams.get('sheetId');
   const gid = searchParams.get('gid') || '0';
+  const headerRow = parseInt(
+    searchParams.get('headerRow') || '1',
+    10
+  );
 
   // Validate required parameters
   if (!sheetId) {
     return NextResponse.json(
       { error: 'sheetId query parameter is required' },
+      { status: 400 }
+    );
+  }
+
+  // Validate headerRow (must be >= 1)
+  if (headerRow < 1 || isNaN(headerRow)) {
+    return NextResponse.json(
+      { error: 'headerRow must be a positive integer' },
       { status: 400 }
     );
   }
@@ -35,12 +47,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ data: [] });
     }
 
-    // Get headers from first line
-    const headers = lines[0].split(',').map((h) => h.trim());
+    // Convert headerRow from 1-indexed to 0-indexed
+    const headerRowIndex = headerRow - 1;
 
-    // Parse data rows
+    // Check if header row exists
+    if (headerRowIndex >= lines.length) {
+      return NextResponse.json(
+        { error: `Header row ${headerRow} is beyond the CSV length` },
+        { status: 400 }
+      );
+    }
+
+    // Get headers from specified row (convert to 0-indexed)
+    const headers = lines[headerRowIndex]
+      .split(',')
+      .map((h) => h.trim());
+
+    // Parse data rows starting from the row after headers
     const data = lines
-      .slice(1)
+      .slice(headerRowIndex + 1) // Start from row after headers
       .map((row) => {
         const cols = row.split(',').map((c) => c.trim());
         const obj: Record<string, string> = {};

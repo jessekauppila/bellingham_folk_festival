@@ -11,23 +11,41 @@ export default function Home() {
   const SHEET_ID = '19AjfMkHUofRTnCry6NQXE96U-nYW45LvrrQsAPw8aSc';
   const GID = '0';
 
-  // State to store the fetched events data
+  const REAL_SHEET_ID =
+    '1ELrjMXnCNGgzCFMhRU6IeGp6hkaua_WECATAvRdBubM';
+  const REAL_GID = '0';
+
+  const [testEvents, setTestEvents] = useState<EventData[] | null>(
+    null
+  );
   const [events, setEvents] = useState<EventData[] | null>(null);
 
-  // Memoize callback to prevent infinite loops
   const handleTestDataFetched = useCallback((data: EventData[]) => {
-    setEvents(data);
+    setTestEvents(data);
     console.log('[Home] Test sheet events data received:', data);
   }, []);
 
-  console.log('[Home] Test sheet events data received:', events);
+  const handleDataFetched = useCallback((data: EventData[]) => {
+    setEvents(data);
+    console.log('[Home] REAL sheet events data received:', data);
+  }, []);
+
+  console.log('[Home] Test sheet events data received:', testEvents);
+  console.log('[Home] REAL sheet events data received:', events);
 
   return (
     <>
       <EventsFetcher
         sheetId={SHEET_ID}
         gid={GID}
+        headerRow={1}
         onDataFetched={handleTestDataFetched}
+      />
+      <EventsFetcher
+        sheetId={REAL_SHEET_ID}
+        gid={REAL_GID}
+        headerRow={10}
+        onDataFetched={handleDataFetched}
       />
       <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
         <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
